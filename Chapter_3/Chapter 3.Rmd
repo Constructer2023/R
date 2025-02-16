@@ -1,0 +1,122 @@
+---
+title: "Chapter 3"
+output: html_document
+date: "Last update: 16/02/2025"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+dose <- c(20, 30, 40, 45, 60)
+drugA <- c(16, 20, 27, 40, 60)
+drugB <- c(15, 18, 25, 31, 40)
+```
+
+### Use Graph
+1. We can save graphics through code or graphical user interface. To save 
+graphics through code, place drawing statements between statements that open the
+target graphics device and statements that close the target graphics device. Here
+is an example.
+```r
+pdf("3_1.pdf")
+  attach(mtcars)
+  plot(wt, mpg)
+  abline(lm(mpg~wt))
+  title("Regression of MPG on Weight")
+  detach(mtcars)
+dev.off()
+```
+2. Function **x11()** without any parameter can be used to create a new graphic
+window.
+3. Only one device is the ‘active’ device: this is the device in which all 
+graphics operations occur. There is a *null device* which is always open but is
+really a placeholder. Devices are associated with a name (e.g., "X11" or "postscript")
+and a number in the range 1 to 63. The null device is always device 1. Once a 
+device has been opened the null device is not considered as a possible active 
+device. There is a list of open devices, and this is considered as a circular 
+list not including the null device. **dev.next()** and **dev.prev()** select the
+next open device in the appropriate direction, unless no device is open. **dev.off()**
+shuts down the specified (by default the current) device. If the current device 
+is shut down and any other devices are open, the next open device is made current.
+It is an error to attempt to shut down device 1. **graphics.off()** shuts down 
+all open graphics devices. Normal termination of a session runs the internal 
+equivalent of graphics.off(). **dev.set()** makes the specified device the 
+active device. If there is no device with that number, it is equivalent to *dev.next()*.
+If which = 1 it opens a new device and selects that. **dev.list()** returns the 
+numbers of all open devices, except device 1, the null device. This is a numeric
+vector with a names attribute giving the device names, or NULL is there is no
+open device.
+Here is an example.
+```r
+x11()
+plot(1:10)
+x11()
+plot(rnorm(10))
+dev.set(dev.prev())
+abline(0, 1)
+dev.set(dev.next())
+abline(h = 0, col = "gray")
+dev.set(dev.prev())
+dev.off(); dev.off()
+```
+### A Simple Example
+```{r table-knit-1, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  dose = c(20, 30, 40, 45, 60),
+  response_to_drugA = c(16, 20, 27, 40, 60),
+  response_to_drugB = c(15, 18, 25, 31, 40)
+)
+kable(data, caption = "Patients' responses to five dose levels of two drugs") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1:3, width = "5cm", latex_column_spec = "c")
+```
+Use the codes below to import the data.
+```r
+dose <- c(20, 30, 40, 45, 60)
+drugA <- c(16, 20, 27, 40, 60)
+drugB <- c(15, 18, 25, 31, 40)
+```
+Use the codes below to create a graph describing correlation between dose of drugA
+and responses.
+```{r, include = TRUE, fig.align = "center"}
+plot(dose, drugA, type = "b")
+```
+
+4. **plot()** is a generic function in R that plots objects. Here, *plot(x, y, type = "b")*
+puts x in horizontal axis and y in vertical axis, paint point set (x, y), then link
+them with lines. Option *type = "b"* indicates painting points and lines. What's
+more, *"p"* for points, *"l"* for lines, *"c"* for empty points joined by lines, 
+*"o"* for overplotted points and lines, *"s"* for stair steps and *"h"* for histogram-like
+vertical lines, *"n"* for not produce any points or lines. We may talk about other
+attributes later.
+
+### Graphics Parameters
+We can customize many features of a graph by modifying options called graph
+parameters(font, color, axis, label). One way to do this is to specify these 
+options via the function **par()**. Parameter values set in this way will remain
+in effect until the session ends unless they are modified again. Its syntax is 
+**par(optionname = value, optionname = value, ...)** . Call *par()* without 
+parameter will generate a list contains current graphic parameter settings. Add
+parameter **no.readonly = TRUE** can create a modifiable current graphic parameter
+settings list.  
+Here is an example.
+```{r, include = TRUE, fig.align = "center"}
+opar <- par(no.readonly = TRUE)
+par(lty = 2, pch = 17) # Equal to par(lty = 2); par(pch = 17)
+plot(dose, drugA, type = "b")
+par(opar)
+```
+The first statement above copies the current graphics parameter settings. The 
+second statement changes the default line type to a dashed line and the default 
+point symbol to a solid triangle. Finally, we draw the graph and restore the
+original settings.  
+Another way to set graphic parameters is to provide key-value pairs 
+*optionname = value* directly to senior graphic functions. But this way only 
+take effect in this graph, and not all parameters are available for all specific
+senior graphic functions.  
+Now, we are going to talk about many graphic parameters.
+
+#### Symbols and Lines

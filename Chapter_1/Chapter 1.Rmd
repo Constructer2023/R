@@ -1,0 +1,69 @@
+---
+title: "Chapter 1"
+output: html_document
+date: "Last update: 16/02/2025"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### R Help System
+#### Opening the help documentation
+```r
+help.start()   # Opens the main index of the R help system in a web browser  
+help("foo")    # Shows the help page for function "foo"  
+?foo           # Equivalent to help("foo")  
+```
+```r
+help.search("foo")  # Searches "foo" in local R documentation  
+??foo               # Shortcut for help.search("foo")  
+```
+```r
+example("foo")  # Runs the examples provided in the help page of "foo"  
+```
+### Miscellaneous R commands
+```r
+# Use the up (^) and down (v) arrow keys on your keyboard to browse past commands  
+setwd("mydirectory")  # Set the current working directory to "mydirectory"  
+history(#)  # Display the last "#" orders, by default "#" is 25  
+save(objectlist, file = "myfile") # Save the specified object to a file  
+load("myfile")  # Read a workplace to the current command window  
+q() # Quit R  
+```
+1. R use backslash(\\) as an escape character.  
+2. **setwd()** will not automatically create a non-exist content. If necessary, we can 
+use **dir.create()** to create a new content, then use the former function to point 
+the workplace to the new one.  
+3. **source("filename")** will run a script in current window.  
+```r
+source("myscript.R")  # This clause will run "myscript.R" here
+```
+4. **sink("filename")** will redirect the output to "filename". By default, if 
+the file exists, then replaces it. Additionally, we can use parameter **append = TRUE** 
+to add the output to the last of the file. Parameter **split = TRUE** can add the 
+output to screen and file at the same time. If we call this function without 
+arguments, it will add output to screen only. It should be noted that the target
+address of **sink()** do not include a file name suffix and should be quoted by
+double quotation marks.  
+5. If there are some outputs are images, then follow the instruction.
+```{r table-knitr, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  functions = c("bmp(\"filename.bmp\")", "jpeg(\"filename.jpeg\")", 
+                "pdf(\"filename.pdf\")", "png(\"filename.png\")",               "postscript(\"filename.ps\")", "svg(\"filename.svg\")", 
+                "win.metafile(\"filename.wmf\")"),
+  outputs = c("BMP file", "JPEG file", "PDF file", "PNG file", "Postscript file", 
+        "SVG file", "Windows metafile")
+)
+kable(data, caption = "Functions for Saving Graphic Output") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1:2, width = "5cm", latex_column_spec = "c")
+```
+6. There are many R functions can be used to manage packages. To install a new 
+package, use the command **install.packages()**. The package name as a parameter
+should be quoted.
+7. Finally, we should use function **dev.off()** to redirect the output to terminal.
