@@ -120,3 +120,37 @@ senior graphic functions.
 Now, we are going to talk about many graphic parameters.
 
 #### Symbols and Lines
+Here are some parameters showed below.
+```{r, table-knit-2, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  parameter = c("pch", "cex", "lty", "lwd"),
+  description = c("Specifies the symbol to use when plotting points.",
+                  "Specifies the symbol size. `cex` is a number indicating the amount by which plotting symbols should be scaled relative to the default.(default = 1)",
+                  "Specifies the line type.",
+                  "Specifies the line width. `lwd` is expressed relative to the default. (default = 1)")
+)
+kable(data, caption = "Parameters for specifying symbol and line type") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1, width = "3cm", latex_column_spec = "c") %>% 
+    column_spec(2, width = "10cm", latex_column_spec = "c")
+```
+Option *pch = * is used to specify the symbols when printing points, belows are
+some possible values.
+
+```{r, echo = FALSE, out.width = "35%", fig.align = "center", fig.cap = "Plotting symbols specified with the pch parameter"}
+knitr::include_graphics("3_1.png")
+```
+For symbols 21~25, we can also specify the border color(col = ) and fill color(bg = ).  
+The option *lty = * can be used to specify the wanted line type.
+```{r, echo = FALSE, out.width = "35%", fig.align = "center", fig.cap = "Line types specified with the lty parameter"}
+knitr::include_graphics("3_2.png")
+```
+Here is an example.
+```{r, include = TRUE, fig.align = "center", fig.cap = "Modify line type, line width, point symbol, symbol size"}
+plot(dose, drugA, type = "b", lty = 3, lwd = 3, pch = 15, cex = 2)
+```
+#### Color
