@@ -1,7 +1,7 @@
 ---
 title: "Chapter 3"
 output: html_document
-date: "Last update: 16/02/2025"
+date: "Last update: 17/02/2025"
 ---
 
 ```{r setup, include = FALSE}
@@ -154,3 +154,137 @@ Here is an example.
 plot(dose, drugA, type = "b", lty = 3, lwd = 3, pch = 15, cex = 2)
 ```
 #### Color
+Here are some parameters showed below.
+```{r, table-knit-3, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  parameter = c("col", "col.axis", "col.lab", "col.main", "col.sub", "fg", "bg"),
+  description = c("The default painting color, some functions can accept a vector contains color values to use circularly.",
+                  "The color of the axis tick text.",
+                  "The color of the axis label.",
+                  "The color of the title.",
+                  "The color of the subtitle.",
+                  "Foreground color of the graphic.",
+                  "Background color of the graphic.")
+)
+kable(data, caption = "Parameters for specifying color") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1, width = "3cm", latex_column_spec = "c") %>% 
+    column_spec(2, width = "10cm", latex_column_spec = "c")
+```
+5. In R, we can specify color using color suffix, color name, hexadecimal color 
+value, RGB value, HSV value, e.g., `col = 1`, `col = "white"`, `col = #FFFFFF`, 
+`col = rgb(1, 1, 1)`, `col = hsv(0, 0, 1)`, these are all specify white. The *rgb()* function generates colors based on the red-green-blue values, while the *hsv()* function generates colors based on the hue-saturation-brightness values.
+6. Function **colors()** will return all available color names. And there are many 
+functions in R can create continuous color vectors, including **rainbow(), heat.colors(), terrain.colors(), topo.colors(), cm.colors()**. For example, *rainbow(10)* can generate 
+ten continuous rainbow type colors.
+7. Multi-level grayscale colors can be generated using the **gray()** function that 
+comes with the basic installation. In this case, a vector with element values
+between 0 and 1 is used to specify the grayscale of each color. *gray(0 : 10 / 10)* 
+will generate 10-level grayscale. Here is an example.
+```{r, include = TRUE, fig.align = "center"}
+n <- 10
+mycolors <- rainbow(10)
+pie(rep(1, n), labels = mycolors, col = mycolors)
+mygrays <- gray(0 : n / n)
+pie(rep(1, n), labels = mygrays, col = mygrays)
+```
+
+#### Text Properties
+Graphic parameters can also specify font size, font, typeface.
+```{r, table-knit-4, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  parameter = c("cex", "cex.axis", "cex.lab", "cex.main", "cex.sub"),
+  description = c("Indicates the value of the zoom factor relative to the default size, the default size is one",
+                  "The value of the zoom factor about axis tick text.",
+                  "The value of the zoom factor about axis label.",
+                  "The value of the zoom factor about title.",
+                  "The value of the zoom factor about subtitle.")
+)
+kable(data, caption = "Parameters for specifying text size") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1, width = "3cm", latex_column_spec = "c") %>% 
+    column_spec(2, width = "10cm", latex_column_spec = "c")
+```
+```{r, table-knit-5, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  parameter = c("font", "font.axis", "font.lab", "font.main", "font.sub", "ps", "family"),
+  description = c("Integer. Used to specify the font style for painting. `1 = regular`, `2 = bold`, `3 = italics`, `4 = bold italics`, `5 = symbol font`(impress as Adobe symbol coding)", 
+                  "The font style of axis tick text.",
+                  "The font style of axis label.",
+                  "The font style of title.",
+                  "The font style of subtitle.",
+                  "Font point size, the actual size of text is `ps*cex`.",
+                  "The font family to use when drawing text.`serif` for serif, `sans` for sans serif, `mono` for fixed width.")
+)
+kable(data, caption = "Parameters for specifying font family, font size, font style") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1, width = "3cm", latex_column_spec = "c") %>% 
+    column_spec(2, width = "10cm", latex_column_spec = "c")
+```
+8. We can set the font size and font style readily, but for font family, something
+different. We have three font styles but map to *True Type Times New Roman*, *True Type Arial*, *True Type Courier New*, respectively. Except that three values, we can 
+also use function **windowsFont()** to create this map in Windows. Here is an example.
+```r
+windowsFonts(
+  A = windowsFont("Arial Black"),
+  B = windowsFont("Bookman Old Style"),
+  C = windowsFont("Comic Sans MS")
+)
+```
+After run this clause, we can use parameter like: *par(family = "A")*. It should 
+be noted that, in Mac, we should use the function **quartzFonts()** instead.
+
+#### Graphics Size and Border Size
+```{r, table-knit-6, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  parameter = c("pin", "mai", "mar"),
+  description = c("Graphic size in inches.(width and height as numeric vector)", 
+                  "The border size represented by a numeric vector in the order bottom, left, top, right, in inches(1 inch = 2.54 cm)",
+                  "The border size represented by a numeric vector in the order bottom, left, top, right, in lines. By default(c(5, 4, 4, 2) + 0.1)")
+)
+kable(data, caption = "Parameters for specifying graphics size and border size") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1, width = "3cm", latex_column_spec = "c") %>% 
+    column_spec(2, width = "10cm", latex_column_spec = "c")
+```
+```r
+par(pin = c(4, 3), mai = c(1, .5, 1, .2))
+```
+The above code create graphs that are 4 inches wide by 3 inches tall, with a 1-inch 
+margin on the bottom and top, a 0.5-inch margin on the left, and a 0.2-inch margin
+on the right.  
+For general review, here is an example.
+```{r, include = TRUE, fig.align = "center"}
+# Copy currrent parameter settings
+opar <- par(no.readonly = TRUE)
+# Set the size of graphs to 2 inches wide by 3 inches tall
+par(pin = c(2, 3))
+# Set the line width double than the default and symbol size 1.5 times to the default
+par(lwd = 2, cex = 1.5)
+# Set the axis tick text size 75% to the default and its font style is italics
+par(cex.axis = .75, font.axis = 3)
+# In graph 1, set the point type as 19 and line type as 2, color is red
+plot(dose, drugA, type = "b", pch = 19, lty = 2, col = "red")
+# In graph 2, set the point type as 23 and line type as 6, point background color as green, line and point border color are blue
+plot(dose, drugB, type = "b", pch = 23, lty = 6, col = "blue", bg = "green")
+# Restore default settings
+par(opar)
+```
+
+### Add Text, Customize Axes and Legends
