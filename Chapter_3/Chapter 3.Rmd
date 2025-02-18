@@ -288,3 +288,146 @@ par(opar)
 ```
 
 ### Add Text, Customize Axes and Legends
+Many advanced functions provide the settings of axis and annotation. Here is an example.
+```{r, include = TRUE, fig.align = "center"}
+plot(dose, drugA, type = "b", col = "red", lty = 2, pch = 2, lwd = 2, main = "Clinical Trials for drug A", sub = "This is a hypothetical data", xlab = "Dosage", ylab = "Drug Response", xlim = c(0, 60), ylim = c(0, 70))
+```
+The above graph adds title, subtitle, axis labels, specifies the range of axis.
+
+#### Title
+9. We can use function **title()** to add title and axis labels for graph. It's 
+calling format is showed below.
+```r
+title(main = "main title", sub = "subtitle", xlab = "x-axis label", ylab = "y-axis label")
+```
+It can also specify other parameters. Here is an example.
+```r
+title(main = "My Title", col.main = "red", sub = "My Subtitle", col.sub = "blue", 
+xlab = "My X label", ylab = "My Y label", col.lab = "green", cex.lab = 0.75)
+```
+10. Function *title()* is usually used to add information to a graph whose default 
+title and axis labels are removed by `ann = FALSE`.
+
+#### Axis
+11. We can use function **axis()** to create customized axis. Syntax as below.
+```r
+axis(side, at = , labels = , pos = , lty = , col = , las = , tck = , ...)
+```
+The parameter above have descriptions here.
+```{r, table-knit-7, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  parameter = c("side", "at", "labels", "pos", "lty", "col", "las", "tck", "(...)"),
+  description = c("An Integer decribes where to paint axis according to graph.(`1 = bottom`, `2 = left`, `3 = top`, `4 = right`)", 
+                  "A numeric vector describes where to paint scale line.",
+                  "A character type vector describes the text annotation next to grids.",
+                  "The coordinates of the position where the axis is drawn.(the value of the position where it intersects with another axis)",
+                  "Line type.",
+                  "The color of lines and grids.",
+                  "If the labels be parallel to(`=0`) or be perpendicular to(`=2`) axis.",
+                  "Length of tick mark as a fraction of the plotting region (a negative number is outside the graph, a positive number is inside, 0 suppresses ticks, 1 creates 
+gridlines); the default is –0.01.",
+                  "Other parameters.")
+)
+kable(data, caption = "Axis options") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1, width = "3cm", latex_column_spec = "c") %>% 
+    column_spec(2, width = "10cm", latex_column_spec = "c")
+```
+When customize axis, we should disable the axis created by senior functions. Parameter
+`axes = FALSE` will disable all axis, `xaxt = "n"`, `yaxt = "n"` will disable x axis
+and y axis, respectively.
+
+12. Function **lines()** can add new graphic elements to current graph. Function 
+**mtext()** can add text to the borders of graph.
+
+The practical example is in "3_4.R", please look up subfolder.
+
+##### Minor Tick Marks
+13. We can use function **minor.tick()** in package **Hmisc** to add minor tick 
+marks. Here is the syntax.
+```r
+library(Hmisc)
+minor.tick(nx = n, ny = n, tick.ratio = n)
+```
+The above parameter, `nx`, `ny` depict how many ranges divided by the minor tick 
+marks between two major tick marks. `tick.ratio` is the length about minor tick 
+marks, `tick.ratio = 1` depicts the same length of the major tick marks.
+
+#### Reference Lines
+14. Function **abline()** can be used to add reference lines to graph, syntax 
+showed below.
+```r
+abline(h = yvalues, v = xvalues)
+```
+The function prototype showed above can also contain other graphic parameters. For
+example, *abline(h = c(1, 5, 7))* will add solid horizontal lines at y = 1, 5, 7.
+
+#### Legend
+```r
+legend(location, title, legend, ...)
+```
+```{r, table-knit-8, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  parameter = c("location", "title", "legend", "(...)"),
+  description = c("Specify the location of legends. We always use keywords, `bottom`, `bottomleft`, `left`, `topleft`, `top`, `topright`, `right`, `bottomright`, `center`. Alternatively, we can also just specify the top left corner's coordinate. `inset` specifies how long the legend move inside the graph(as fraction of plot region)",
+                  "Legend title string.",
+                  "Character type vector made of legend labels.",
+                  "Other parameters.")
+)
+kable(data, caption = "Legend options") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1, width = "3cm", latex_column_spec = "c") %>% 
+    column_spec(2, width = "10cm", latex_column_spec = "c")
+```
+Specify `horiz = TRUE` can horizontally lay down legends instead of lay it vertically.  
+The practical example is in "3_5.R", please look up subfolder.
+
+#### Text Annotation
+15. We can use function **text()** and **mtext()** to add text on graph. *text()*
+can add text inside the plot region while *mtext()* can add text to one of four 
+borders.
+```r
+text(location, "text to place", pos, ...)
+mtext("text to place", side, line = n, ...)
+```
+```{r, table-knit-9, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  parameter = c("location", "pos", "side"),
+  description = c("Text location. It can be a coordinate (x, y), or specify it as `location(1)` to use mouse set its location interactively.",
+                  "Position relative to location. `1 = below`, `2 = left`, `3 = above`, `4 = right`. If specify pos, we can specify `offset = ` in percent of character width.",
+                  "Which margin to place text in, where `1 = bottom`, `2 = left`, `3 = top`, `4 = right`. We can specify `line = ` to indicate the line in the margin starting with 0 (closest to the plot area) and moving out. We can also specify `adj = 0` for left/bottom alignment or `adj = 1` for top/right alignment.")
+)
+kable(data, caption = "Options for text() and mtext()") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1, width = "3cm", latex_column_spec = "c") %>% 
+    column_spec(2, width = "10cm", latex_column_spec = "c")
+```
+Here is an example.
+```{r, include = TRUE, fig.align = "center"}
+attach(mtcars)
+  plot(wt, mpg, main = "Mileage vs. Car Weight", xlab = "Weight", ylab = "Mileage",
+       pch = 18, col = "blue")
+  # Add text annotations on (wt, mpg)
+  text(wt, mpg, row.names(mtcars), cex = 0.6, pos = 4, col = "red")
+detach(mtcars)
+```
+
+#### Math Annotations
+16. Finally, we can add mathematical symbols and formulas to a graph using TEX-like rules.
+```{r, echo = FALSE, out.width = "35%", fig.align = "center", fig.cap = "Partial results of demo(plotmath)"}
+knitr::include_graphics("3_3.png")
+```
+
+### Combining Graphs
