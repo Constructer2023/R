@@ -1,7 +1,7 @@
 ---
 title: "Chapter 3"
 output: html_document
-date: "Last update: 17/02/2025"
+date: "Last update: 19/02/2025"
 ---
 
 ```{r setup, include = FALSE}
@@ -431,3 +431,69 @@ knitr::include_graphics("3_3.png")
 ```
 
 ### Combining Graphs
+17. We can use function **par()** pr **layout()** in R to easily combine multiple
+graphs to general one.
+```r
+# Filled by row
+par(mfrow = c(nrows, ncols))
+# Filled by column
+par(mfcol = c(nrows, ncols))
+```
+Here is an example.
+```{r, include = TRUE, fig.align = "center"}
+attach(mtcars)
+  opar <- par(no.readonly = TRUE)
+  par(mfrow = c(2, 2))
+  plot(wt, mpg, main = "Scatterplot of wt vs. mpg")
+  plot(wt, disp, main = "Scatterplot of wt vs. disp")
+  hist(wt, main = "Histogram of wt")
+  boxplot(wt, main = "Boxplot of wt")
+  par(opar)
+detach(mtcars)
+```
+The function **layout()** has syntax as below.
+```r
+layout(allocation_matrix, widths = c(col1, col2, ...), heights = c(row1, row2, ...))
+```
+The above parameter, *allocation_matrix* is the graph allocation matrix, *byrow*
+is whether to filled by row. *widths* and *heights* are vectors, describe the width
+or height about each column or row. Here is an example.
+```{r, include = TRUE, fig.align = "center"}
+attach(mtcars)
+  layout(matrix(c(1, 1, 2, 3), nrow = 2, ncol = 2, byrow = TRUE),
+         widths = c(3, 1), heights = c(1, 2))
+  hist(wt)
+  hist(mpg)
+  hist(disp)
+detach(mtcars)
+```
+The above code, *matrix(c(1, 1, 2, 3), nrow = 2, ncol = 2, byrow = TRUE)* means 
+the first graph will occupy the whole first row, and the second row contains the 
+second graph and the third graph.
+
+#### Fine-Grained Control over Graph Layout
+18. We can also assign more meaningful location to each graph using parameter `fig = `.
+Parameter *fig = * is a numeric vector resembles `c(x1, x2, y1, y2)`.
+```{r, echo = FALSE, out.width = "40%", fig.align = "center", fig.cap = "Schematic diagram using parameter 'fig'"}
+knitr::include_graphics("3_4.png")
+```
+
+Before we add each graph, we should use *fig* as parameter in function *par()* to
+specify the appointed area for the following graph. And there are another parameter
+should be focused on, `new`, this parameter specifies the following graph will be
+added to the current window but not replace it. The reason to mention this is *fig*
+will create a new graph by default, so we should also specify `new = TRUE` in
+function *par()* when using parameter *fig*. Here is an example.
+```{r, include = TRUE, fig.align = "center"}
+opar <- par(no.readonly = TRUE)
+par(fig = c(0, 0.8, 0, 0.8))
+plot(mtcars$wt, mtcars$mpg, xlab = "Miles Per Gallon", ylab = "Car Weight")
+par(fig = c(0, 0.8, 0.55, 1), new = TRUE)
+boxplot(mtcars$wt, horizontal = TRUE, axes = FALSE)
+par(fig = c(0.65, 1, 0, 0.8), new = TRUE)
+boxplot(mtcars$mpg, axes = FALSE)
+mtext("Enhanced Scatterplot", side = 3, outer = TRUE, line = -3)
+par(opar)
+```
+If we encounter errors like *"Error in plot.new(): figure margins too large"*, modify
+the location and size about subgraphs in the plot.
