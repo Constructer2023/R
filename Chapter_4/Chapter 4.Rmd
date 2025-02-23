@@ -1,29 +1,44 @@
 ---
 title: "Chapter 4"
 output: html_document
-date: "Last update: 19/02/2025"
+date: "Last update: 23/02/2025"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+### Create New Variables
+We always create new variables through this syntax.
+```r
+variable_name <- expression
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+The composition above, *expression* can involve many operators and functions, 
+here are some arithmetic operators that can form formulas.
+```{r table-knit-1, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  operator = c("\\+", "\\-", "\\*", "/", "^ or **", "x %% y", "x %/% y"),
+  description = c("Add",
+                  "Subtract",
+                  "Multiply",
+                  "Divide",
+                  "Exponentiation",
+                  "Complementation(x mod y), 5 %% 2 = 1",
+                  "Integer Division, 5 %/% 2 = 2")
+)
+kable(data, caption = "Arithmetic operators") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1:2, width = "5cm", latex_column_spec = "c")
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+1. Function **transform()** can do anything useful with data frames currently. Here
+is an example, we use this function to add two variables to data frame mydata.
+```{r, include = TRUE}
+mydata <- data.frame(x1 = c(2, 2, 6, 4), x2 = c(3, 4, 2, 8))
+mydata <- transform(mydata, sumx = x1 + x2, meanx = (x1 + x2) / 2)
+mydata
+```
+### Reencoding of Variables

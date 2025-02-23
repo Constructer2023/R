@@ -12,16 +12,16 @@ drugB <- c(15, 18, 25, 31, 40)
 ```
 
 ### Use Graph
-1. We can save graphics through code or graphical user interface. To save 
+1. We can save graphs through code or graphical user interface. To save 
 graphics through code, place drawing statements between statements that open the
 target graphics device and statements that close the target graphics device. Here
 is an example.
 ```r
 pdf("3_1.pdf")
   attach(mtcars)
-  plot(wt, mpg)
-  abline(lm(mpg~wt))
-  title("Regression of MPG on Weight")
+    plot(wt, mpg)
+    abline(lm(mpg~wt))
+    title("Regression of MPG on Weight")
   detach(mtcars)
 dev.off()
 ```
