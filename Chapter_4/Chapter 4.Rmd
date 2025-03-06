@@ -168,3 +168,135 @@ with some of the cases, but it is just a junior strategy, we will discuss some
 senior strategies later.
 
 ### Date Value
+14. Date value often input into R as strings, then transform to numbers, function
+**as.Date()** can do this transformation. It's prototype is here.
+```r
+as.Date(x, "input_format")
+```
+The above parameter, *x* is character type data, *input_format* is the suitable
+type for date input.
+```{r table-knit-3, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  operator = c("%d", "%a", "%A", "%m", "%b", "%B", "%y", "%Y"),
+  description = c("Day as a number(0 ~ 31)",
+                  "Abbreviated weekday",
+                  "Unabbreviated weekday",
+                  "Month(0 ~ 12)",
+                  "Abbreviated month",
+                  "Unabbreviated month",
+                  "Two-digit year",
+                  "Four-digit year"),
+  instance = c("0 ~ 31", "Mon", "Monday", "00 ~ 12", "Jan", "January", "07", "2007")
+)
+kable(data, caption = "Date type", escape = FALSE, format = "html") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1:3, width = "5cm", latex_column_spec = "c")
+```
+The default format for date value as input is `yyyy-mm-dd`.
+```{r, include = TRUE}
+# This clause transforms the character type data to corresponding date.
+mydates <- as.Date(c("2007-06-22", "2004-02-13"))
+mydates
+# This clause uses `mm/dd/yyyy` type to read data
+strDates <- c("01/05/1965", "08/16/1975")
+dates <- as.Date(strDates, "%m/%d/%Y")
+dates
+```
+Use specified type to read character type variable and substitute it for the data
+frame variable as a date variable.
+
+15. **Sys.Date()** can return the current date, and **date()** can return the current
+date and current time.
+16. We can use **format(x, format = "output_format")** to print the specified date
+and extract part of the date. This function can receive a parameter and print it
+in specified types.
+17. In R, when store dates, it uses days from January 1, 1970. The days earlier 
+than this day will be stored as a negative. And we can do some calculation on dates,
+but remember, we must transform the date value using *as.Date()* before that.
+18. Function **difftime()** can be used to calculate the time interval, and output
+in week, day, hour, minute, second. The syntax of this is **difftime(end, start, units = "weeks")**
+
+### Type Conversion
+19. There are many data types in R, and resembles other statistical programming
+languages, all these can transform each other.
+```{r table-knit-4, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  judgement = c("is.numeric()", "is.character()", "is.vector()", "is.matrix()",
+                "is.data.frame()", "is.factor()", "is.logical()"),
+  transformation = c("as.numeric()",
+                  "as.character()",
+                  "as.vector()",
+                  "as.matrix()",
+                  "as.data.frame()",
+                  "as.factor()",
+                  "as.logical()")
+)
+kable(data, caption = "Logical operators", escape = FALSE, format = "html") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1:2, width = "5cm", latex_column_spec = "c")
+```
+The above functions, the form *is.datatype()* return TRUE or FALSE, the form *as.datatype()* convert the argument to that type.
+
+### Data Sorting
+20. We always use function **order()** to sort data frames, the sorting order is
+ascending by default. If we want to sort it by descending order, then add a minus
+sign before the sorting variable. Here is an example.
+```{r, include = TRUE}
+# Create a new data frame, the rows are sorted by age ascending
+newdata <- leadership[order(leadership$age), ]
+newdata
+# Sorts the rows into female followed by male, and youngest to oldest within each gender
+attach(leadership)
+  newdata <- leadership[order(gender, age), ]
+  newdata
+detach(leadership)
+# Sorts the rows by gender, and then from oldest to youngest manager within each gender
+attach(leadership)
+  newdata <- leadership[order(gender, -age), ]
+  newdata
+detach(leadership)
+```
+It's worth noting that, function *order()* takes the order of parameters as the 
+sorting orders. `order(A, B)` will sort the data frame or something others by A
+then by B. And the return of this function is usually a vector contains the serial
+number of each element. For instance, `order(c(21, 52, 42, 12, 30)) = [4, 1, 5, 3, 2]`.
+Btw, remember the reference rule of data frame's elements can be helpful to understand
+the above code clause.
+
+### Merging Datasets
+21. Function **merge()** can merge two data frames horizontally, on many cases, 
+two data frames have one or more common variables to link, it is also called 
+inner join. Here is an example.
+```r
+# Merge two data frames by ID
+total <- merge(dataframeA, dataframeB, by = "ID")
+# Merge two data frames by ID and country
+total <- merge(dataframeA, dataframeB, by = c("ID", "Country"))
+```
+The similar link is often used to add variables to data frames.
+
+22. If we want to merge two matrixes or data frames directly without a key, just 
+use function **cbind()**. `total <- cbind(A, B)`. Every element must have same 
+number of rows and sorted in same sequence.
+23. If we need to merge two matrixes vertically, use function **rbind()**. `total <- rbind(dataframeA, dataframeB)`. Two data frames must have same variables, if not,
+delete the redundant variables in one data frame or add a new variable to the other
+variable and set the values NA.
+
+### Subsetting Datasets
+#### Select Variables
+24. In data frame, we select variables through `dataframe[row_indices, column_indices]`.
+Alternatively, we can select it through its name, here is an example.
+```{r, include = TRUE}
+myvars <- c("item1", "item2", "item3", "item4", "item5")
+newdata <- leadership[myvars]
+newdata
+```
+#### Dropping Variables
