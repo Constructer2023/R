@@ -1,7 +1,7 @@
 ---
 title: "Chapter 4"
 output: html_document
-date: "Last update: 23/02/2025"
+date: "Last update: 08/03/2025"
 ---
 
 ```{r setup, include=FALSE}
@@ -300,3 +300,75 @@ newdata <- leadership[myvars]
 newdata
 ```
 #### Dropping Variables
+```{r, include = TRUE}
+leadership_temp <- leadership
+myvars <- names(leadership) %in% c("item3", "item4")
+newdata <- leadership[!myvars]
+# names(leadership) creates a character vector contains all variable names
+# names(leadership) %in% c("item3", "item4") returns a logical vector, every matched
+# element in names(leadership) is TRUE, while the others are FALSE
+# operator not(!) reverses the logical value
+# leadership[!myvars] select the columns where the logical values are TRUE
+newdata <- leadership[c(-8, -9)]
+# If we know item3 and item4 is the eighth and ninth variables, we can also use 
+# this code to delete the target items
+leadership$item3 <- leadership$item4 <- NULL
+# Last, same variables deletion can also use this code
+leadership <- leadership_temp
+```
+The above keyword **NULL**, means not defined, is different from NA which means
+not applicable.
+
+#### Selecting Observations
+It is simple to understand. Here is an example.
+```{r, include = TRUE}
+newdata <- leadership[1 : 3, ]
+attach(leadership)
+  newdata <- leadership[gender == 'M' & age > 30, ]
+detach(leadership)
+```
+In the above code, we select the first three observations, then select all men 
+over 30. `gender == 'M'` and `age > 30` will create logical vectors.
+```{r, include = TRUE}
+leadership
+leadership$date <- as.Date(leadership$date, "%d/%m/%y")
+startdate <- as.Date("2009-01-01")
+enddate <- as.Date("2009-10-31")
+newdata <- leadership[which(leadership$date >= startdate & leadership$date <= enddate), ]
+newdata
+```
+The above clauses, function **which()** can give the TRUE indices of a logical 
+object, allowing for array indices. e.g., `which(obj <- c(TRUE, FALSE, TRUE, NA, FALSE, FALSE, TRUE)) = [1, 3, 7]`.
+
+#### Function subset()
+25. Function **subset()** can do the same thing as filtering datasets, here is an example.
+```{r, include = TRUE}
+# Select all observations where ages no less than 35 and smaller than 24
+# Keep variables q1 to q4 at the meantime
+newdata <- subset(leadership, age >= 35 | age < 24, select = c(item1, item2, item3, item4))
+newdata
+# Select all men above 25
+# Keep variables gender to q4 at the meantime
+newdata <- subset(leadership, gender == 'M' & age > 25, select = gender : item4)
+newdata
+```
+#### Random Samples
+26. Function **sample()** can take a random sample(with or without replacement) 
+of size n from a dataset. Its format is here.
+```r
+sample(sample_vector, size, replace = TRUE/FALSE)
+```
+The above parameter, *sample_vector* is the vector of elements to choose from; 
+*size* is the sample size, usually is a number; *replace* is to specify choose 
+with or without replacement.
+```{r, include = TRUE}
+mysample <- leadership[sample(1 : nrow(leadership), 3, replace = FALSE), ]
+mysample
+```
+The above code, function *sample()* returns a numeric vector to specify the rows
+to choose. The function **nrow()** is used to calculated the number of rows 
+leadership has.
+
+### Using SQL to Manipulate Data Frame
+27. Surprisingly, we can also use SQL in R to handle data frame, just install
+the package **sqldf**. Search on <http://code.google.com/p/sqldf/> to refer more.
