@@ -1,10 +1,10 @@
 ---
 title: "Chapter 4"
 output: html_document
-date: "Last update: 08/03/2025"
+date: "Last update: 30/03/2025"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 manager <- c(1, 2, 3, 4, 5)
 date <- c("24/10/08", "28/10/08", "01/10/08", "12/10/08", "01/05/09")
@@ -95,6 +95,7 @@ head(leadership$agecat)
 3. Funciton **within()** resembles function **with()**, but it can modify the data
 frame.
 4. `NA` is a keyword in R.
+
 ### Rename Variables
 5. We can use interactive window to change a variable name using function **fix()**.
 This function always takes effect on a data frame.
@@ -238,7 +239,7 @@ data <- data.frame(
                   "as.factor()",
                   "as.logical()")
 )
-kable(data, caption = "Logical operators", escape = FALSE, format = "html") %>% 
+kable(data, caption = "Data type operation function", escape = FALSE, format = "html") %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
                 full_width = FALSE) %>% 
     column_spec(1:2, width = "5cm", latex_column_spec = "c")
