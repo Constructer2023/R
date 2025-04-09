@@ -1,0 +1,10 @@
+---
+title: "Chapter 6"
+output: html_document
+date: "Last update: 09/04/2025"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Bar Charts
