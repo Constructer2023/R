@@ -1,7 +1,7 @@
 dose <- c(20, 30, 40, 45, 60)
 drugA <- c(16, 20, 27, 40, 60)
 drugB <- c(15, 18, 25, 31, 40)
-opar <- par(no..readonly = TRUE)
+opar <- par(no.readonly = TRUE)
 
 par(lwd = 2, cex = 1.5, font.lab = 2)
 # Set the range of y axis is 0 to 60, set title, x label, y label
