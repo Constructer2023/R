@@ -1,0 +1,517 @@
+---
+title: "Chapter 7"
+output: html_document
+date: "Last update: 17/04/2025"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Descriptive Statistics
+In this section, we continue to use the package **mtcars**. We will focus on the 
+miles per gallon(mpg), horsepower(hp), weight(wt). In the package, transmission 
+type(am) is a binary variable(`0 = automatic, 1 = manual`), and the number of
+cyliners(cyl) can be 4, 5, 6.
+
+#### General Methods
+1. We can use function **summary()** to obtain the descriptive statistics. Here
+is an example.
+```{r, include = TRUE}
+myvars <- c("mpg", "hp", "wt")
+summary(mtcars[myvars])
+```
+2. Function **summary()** provides the minimum, the maximum, quartiles, mean for
+numeric variables, and frequencies for factors and logical variables. We can use
+functions **apply()** or **sapply()** to calculate any descriptive statistics. Its
+format here.
+```r
+sapply(x, FUN, options)
+```
+The above parameter, *x* is the data frame or matrix, *FUN* is a specific function,
+if *options* are specified, they will be passed to *FUN*.
+
+3. Function **fivenum()** can return the basic five statistical numbers(Tukey's 
+five-number summary), including the minimum, lower quartile, median, upper quartile,
+the maximum. R does not provide skew or kurtosis. But here is an example for that.
+```{r, include = TRUE}
+mystats <- function(x, na.omit = FALSE){
+  # Omit the NA value
+  if (na.omit)
+    x <- x[!is.na(x)]
+  m <- mean(x)
+  n <- length(x)
+  s <- sd(x)
+  skew <- sum((x - m) ^ 3 / s ^ 3) / n
+  kurt <- sum((x - m) ^ 4 / s ^ 4) / n - 3
+  return(c(n = n, mean = m, stdev = s, skew = skew, kurtosis = kurt))
+}
+myvars <- c("mpg", "hp", "wt")
+sapply(mtcars[myvars], mystats)
+```
+The above code, skew is a measure of the asymmetry of the probability distribution
+of a real-valued random variable about its mean. If it is positive, then skew to
+right, if negative, then skew to left. Kurtosis refers to the degree of "tailedness"
+in the probability distribution of a real-valued random variable. If greater than 
+3, then its values locate around mean less or its graph displays steeper, if less
+than 3, then its values locate around mean more or its graph displays flatter. If
+we plot, these numbers are the most conspicuous.
+
+4. Function **describe()** in package **Hmisc** can return number of variables and 
+observations, number of missing values, number of unique values, mean, some quantiles,
+five maximum values and five minimum values. Here is an example.
+```{r, include = TRUE}
+library(Hmisc)
+myvars <- c("mpg", "hp", "wt")
+describe(mtcars[myvars])
+```
+Function **stat.desc()** in package **pastecs** can also calculate many statistical
+values, its prototype here.
+```r
+stat.desc(x, basic = TRUE, desc = TRUE, norm = FALSE, p = 0.95)
+```
+Where *x* is a data frame or a time series. *p* is the confidence interval for the
+mean, 0.95 by default. Other parameters can look up "?stat.desc()". Here is an example.
+```{r, include = TRUE}
+library(pastecs)
+myvars <- c("mpg", "hp", "wt")
+stat.desc(mtcars[myvars])
+```
+There is another function has the same name **describe()** in package **psych**, 
+it can do some analysis too. Here is an example.
+```{r, include = TRUE}
+library(psych)
+myvars <- c("mpg", "hp", "wt")
+describe(mtcars[myvars])
+```
+5. Note that, package **psych** and **Hmisc** both provide function **describe()**.
+R will take the last loaded package as priority. The above code, indicate that
+function **describe()** in package **Hmisc** is masked by the new one. If we still
+want to use function **describe()** in package **Hmisc**, we can type `Hmisc::describe()`
+to cite that.
+
+#### Descriptive Statistics by Group
+When comparing many groups data or observations, we often focus on each group but
+not the whole sample size. Here is an example.
+```{r, include = TRUE}
+myvars <- c("mpg", "hp", "wt")
+aggregate(mtcars[myvars], by = list(am = mtcars$am), mean)
+aggregate(mtcars[myvars], by = list(am = mtcars$am), sd)
+```
+Note that, the syntax of list here is important. When specifying the parameter of
+function **aggregate()**, we can use `by = list(name1 = groupvar1, name2 = groupvar2, ... , nameN = groupvarN)`. And Function **aggregate()** only support the single return 
+function as its parameter.
+
+6. If we want to specify some multiple return functions as function **aggregate()**'s 
+parameter. Use function **by()**. Its format here.
+```r
+by(data, INDICES, FUN)
+```
+The above parameters, *data* is a data frame or matrix, *INDICES* is a factor or 
+a list formed by factors, defined groups, *FUN* is any function. Here is an example.
+```{r, include = TRUE}
+# Here is a nested function, we define a new function using self-defined function
+dstats <- function(x){
+  sapply(x, mystats)
+}
+myvars <- c("mpg", "hp", "wt")
+by(mtcars[myvars], mtcars$am, dstats)
+```
+Except self-defined functions, package **doBy** and **psych** also include some 
+useful functions.
+
+7. Function **summaryBy()** in package **doBy** can do the same thing. Its format 
+here.
+```r
+summaryBy(formula, data = dataframe, FUN = function)
+```
+The above parameter, *formula* supports this prototype `var1 + var2 + var3 + ... + varN ~ groupvar1 + groupvar2 + ... + groupvarN`, whose type resembles the parameter of
+function **dcast()**. The variables left to the symbol "~" are the numeric variables
+waiting for analyzing, the variables right to the symbol "~" are categorical grouping 
+variables. Here is an example.
+```{r, include = TRUE}
+library(doBy)
+summaryBy(mpg + hp + wt ~ am, data = mtcars, FUN = mystats)
+```
+8. Function **describeBy()** in package **psych** has the same use as function 
+**describe()** but group variables. Here is an example.
+```{r, include = TRUE}
+library(psych)
+myvars <- c("mpg", "hp", "wt")
+describeBy(mtcars[myvars], list(am = mtcars$am))
+```
+### Frequency and Contingency Tables
+In this section, the data set "Arthritis" from package *vcd* will be the example.
+Its first six observations here.
+```{r}
+library(vcd)
+head(Arthritis)
+```
+Many variables in this data set are categorical factors.
+
+#### Frequency Tables
+Here is a table including some methods about generating frequency and contingency 
+tables.
+```{r table-knit-1, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  functions = c("table(var1, var2, ..., varN)", "xtabs(formula, data)", "prop.table(table, margins)", "margin.table(table, margins)", "addmargins(table, margins)", "ftable(table)"),
+  description = c("Create a N-dimensional contingency table using N categorical factors", 
+                  "Create a N-dimensional contingency table using a formula and a matrix or a data frame", 
+                  "Express table entries as fractions of the marginal table defined by the margins", 
+                  "Compute the sum of table entries for a marginal table defined by the margins", 
+                  "Put summary margins (sums by default) on a table", 
+                  "Create a compact, flat contingency table")
+)
+kable(data, caption = "Functions used to create and dispose contingency tables") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1, width = "5cm", latex_column_spec = "c") %>% 
+    column_spec(2, width = "10cm", latex_column_spec = "c")
+```
+##### One-Way Tables
+9. We can generate simple frequency counts using function **table()**. Or use
+function **prop.table()** to generate a table with proportion. Here is an example.
+```{r, include = TRUE}
+library(vcd)
+mytable <- with(Arthritis, table(Improved))
+mytable
+# Use function **prop.table()** to generate ratio data
+# Note that the parameter is a table
+prop.table(mytable)
+# Generate percent data
+prop.table(mytable) * 100
+```
+##### Two-Way Tables
+10. In terms of two-way tables, the format of function **table()** is here.
+```r
+mytable <- table(A, B)
+```
+The above parameters, *A* is row variable, *B* is column variable. Function **xtabs()**
+can be used like this.
+```r
+mytable <- xtabs(~ A + B, data = mydata)
+```
+The above parameters, *mydata* is a matrix or a data frame. All the cross-classified
+variables should appear on the right side of the symbol "~". The left side variables
+will be frequencies vector. Here is an example.
+```{r, include = TRUE}
+library(vcd)
+mytable <- xtabs(~ Treatment + Improved, data = Arthritis)
+mytable
+# Use other functions to generate margin frequencies and ratios
+# Note that, these functions' input are tables
+# The parameter "1" below represent grouping the first variable in the tables
+# Each group has their own analyzing statistics
+margin.table(mytable, 1)
+prop.table(mytable, 1)
+# The above example separates the cases by *Treatment*
+# We can compute the column statistics by setting *margins* to "2"
+margin.table(mytable, 2)
+prop.table(mytable, 2)
+# If ignore *margins*, then every calculation is set to the whole table
+prop.table(mytable)
+```
+11. We can use function **addmargins()** to add marginal sums to tables. In this
+function, first parameter is a table. Here is an example.
+```{r, include = TRUE}
+addmargins(mytable)
+addmargins(prop.table(mytable))
+# The format is addmargins(table, margins), when *margins* is set, only add the specified margins
+addmargins(prop.table(mytable, 1), 2)
+addmargins(prop.table(mytable, 2), 1)
+```
+12. There is a difference between these functions. In terms of function **prop.table()**,
+when its parameter *margins* is set to "1", that means calculate the proportions
+of the rows in every column. In terms of function **margin.table()**, when its 
+parameter *margins* is set to "1", that means calculate the cases in every row.
+In terms of function **addmargins()**, when its parameter *margins* is set to "1",
+that means add up the rows in every column.
+13. Function **table()** ignores the NA values. If we want to regard NA values as
+an effective type, set parameter `useNA = "ifany"`.
+14. We can also use function **CrossTable()** in package **gmodels** to create
+two-way tables. This function models after **CROSSTABS** in **SPSS**. Here is an
+example.
+```{r, include = TRUE}
+library(gmodels)
+CrossTable(Arthritis$Treatment, Arthritis$Improved)
+```
+There are many options in function **CrossTable()**, refer to `help(CrossTable)`.
+
+##### Multidimensional Tables
+15. The functions in previous sheet can do the same thing when turns to multidimensional
+tables. Alternatively, function **ftable()** can output tables through more attractive 
+way. It is compact. Here is an example.
+```{r, include = TRUE}
+library(vcd)
+mytable <- xtabs(~ Treatment + Sex + Improved, data = Arthritis)
+mytable
+ftable(mytable)
+margin.table(mytable, 1)
+margin.table(mytable, 2)
+margin.table(mytable, 3)
+# We can also calculate the marginal sums of multiple keys
+margin.table(mytable, c(1, 3))
+ftable(prop.table(mytable, c(1, 2)))
+ftable(addmargins(prop.table(mytable, c(1, 2)), 3))
+# If we want to obtain percentage
+ftable(addmargins(prop.table(mytable, c(1, 2)), 3)) * 100
+```
+Note that, the function **ftable()**'s input is a table. And this function does
+not need to import any package.
+
+#### Test of Independence
+R provides many methods for testing independence of categorical variables. Here
+are some details.
+
+##### Chi-Square Test of Independence
+16. We can use function **chisq.test()** to produce a chi-square test of independence
+of the row and column variables. Here is an example.
+```{r, include = TRUE}
+library(vcd)
+mytable <- xtabs(~ Treatment + Improved, data = Arthritis)
+# chisq.test(table)
+chisq.test(mytable)
+mytable <- xtabs(~ Improved + Sex, data = Arthritis)
+chisq.test(mytable)
+```
+In above codes, the p-value represents the probability that the sample row variable
+and column variable drawn from the population are independent of each other. When 
+p-value is smaller than 0.01, we assume the variables have some relationship, when
+p-value is greater than 0.05, we assume the variables are independent.
+
+##### Fisher's Exact Test
+17. We can also use function **fisher.test()** to produce fisher exact test. Its
+original hypothesis is the fixed marginal contingency tables' rows and columns are
+independent. Here is an example.
+```{r, include = TRUE}
+mytable <- xtabs(~ Treatment + Improved, data = Arthritis)
+# fisher.test(table)
+fisher.test(mytable)
+```
+The p-value in above codes has the same meanings with function *chisq.test()*. It 
+represents the probability of the hypothesis. There is a limitation when using
+this function, it can not be applied to a 2*2 table.
+
+##### Cochran-Mantel-Haenszel Test
+18. Function **mantelhaen.test()** can do a Cochran–Mantel–Haenszel chi-square test.
+Its original hypothesis is in each stratum of third variable, two nominal variables
+are conditionally independent. Here is an example.
+```{r, include = TRUE}
+mytable <- xtabs(~ Treatment + Improved + Sex, data = Arthritis)
+mantelhaen.test(mytable)
+```
+The above code assumes there's no three-way interaction(Treatment + Improved + Sex).
+
+#### Measures of Association
+If two variables have relationship, we want to know about its strength of the
+relationships present. Function **assocstats()** in package **vcd** can help us
+calculate phi coefficient, contingency coefficient, and Cramer's V for a two-way
+table. Here is an example.
+```{r, include = TRUE}
+library(vcd)
+mytable <- xtabs(~ Treatment + Improved, data = Arthritis)
+assocstats(mytable)
+```
+All in all, greater values mean stronger relationships. Additionally, there is a 
+function **kappa()** in package **vcd** can calculate Cohen's kappa value and weighted
+kappa value of a confusion matrix.
+
+#### Visualizing Results
+Package **vcd** has exceptional functions used to visualizing relationships among
+categorical variables in multidimensional data sets using mosaic and association
+plots.
+
+### Correlations
+Correlation value can describe the relationship among quantitative variables. The 
+sign **±** indicates the direction of the relationship(positive or negative), its
+magnitude indicates the strength of the relationship(0 for no relationship and 1
+for perfectly predictable relationship).
+
+#### Types of correlations
+##### Pearson, Spearman, Kendall Correlations
+Pearson product-moment correlation assesses the degree of linear relationship between
+two quantitative variables. Spearman’s rank-order correlation coefficient assesses
+the degree of relationship between two rank-ordered variables. Kendall’s tau is 
+also a nonparametric measure of rank correlation.
+
+19. Function **cor()** can calculate these three correlation coefficients, when
+function **cov()** can calculate covariance. There is one type of format here.
+```r
+cor(x, use = , method = )
+```
+```{r table-knit-2, echo = FALSE}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+data <- data.frame(
+  functions = c("x", "use", "method"),
+  description = c("A matrix or a data frame", 
+                  "Specify the dispose method of missing values. The options can be `all.obs` means producing an error when discover a missing value. `everything` means set the result `missing` when discover a missing value. `complete.obs` means delete the rows. `pairwise.complete.obs` means pairwise deletion", 
+                  "Specifies the types of correlation. It can be `pearson`, `spearman`, `kendall`" 
+                  )
+)
+kable(data, caption = "Parameters of cor() and cov()") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"), 
+                full_width = FALSE) %>% 
+    column_spec(1, width = "5cm", latex_column_spec = "c") %>% 
+    column_spec(2, width = "10cm", latex_column_spec = "c")
+```
+The default parameters are `use = everything`, `method = pearson`. Here is an example.
+```{r, include = TRUE}
+states <- state.x77[ , 1 : 6]
+cov(states)
+cor(states)
+cor(states, method = "spearman")
+```
+By default, the results of function **cor()** is a square matrix, it also can be
+other shapes. Here is an example.
+```{r, include = TRUE}
+x <- states[ , c("Population", "Income", "Illiteracy", "HS Grad")]
+y <- states[ , c("Life Exp", "Murder")]
+cor(x, y)
+```
+##### Partial Correlations
+20. Partial correlation is a correlation between two quantitative variables when
+controlling one or more other quantitative variables. We can use function **pcor()**
+in package **ggm** to calculate it. This package needs to be installed before using.
+Its format here.
+```r
+pcor(u, S)
+```
+The above parameters, *u* is a numeric vector, first two elements represent the 
+indices of the variables to be correlated, other elements represent the conditional
+variables' indices. *S* is the covariance matrix of variables. Here is an example.
+```{r, include = TRUE}
+library(ggm)
+colnames(states)
+pcor(c(1, 5, 2, 3, 6), cov(states))
+```
+#### Testing Correlations for Significance
+21. We can use function **cor.test()** to test an individual Pearson, Spearman, 
+Kendall correlation coefficient. A simplified format is here.
+```r
+cor.test(x, y, alternative = , method = )
+```
+The above parameters, *x* and *y* are variables to be correlated, *alternative* 
+specifies a two-tailed or one-tailed test(`two.side`, `less`, `greater`), *method*
+specifies the correlation type(`pearson`, `kendall`, `spearman`). The typical hypothesis
+is population correlation isn't equal to 0, which is set `alternative = "two.side"`.
+When the correlation is less than 0, set `alternative = "less"`, when the correlation 
+is greater than 0, set `alternative = "greater"`. Here is an example.
+```{r, include = TRUE}
+cor.test(states[ , 3], states[ , 5])
+```
+22. Function **corr.test()** can test only one correlation at one time unfortunately.
+But there is a function **corr.test()** in package **psych** can do more. This
+function can calculate correlation matrix and significance levels for matrices of
+Pearson, Spearman, Kendall correlations. Here is an example.
+```{r, include = TRUE}
+library(psych)
+corr.test(states, use = "complete")
+```
+The parameter **use =** can be set to `pairwise` or `complete`, represents pairwise 
+deletion for missing values or row deletion for missing values respectively. The
+parameter **method =** can be set to `pearson`(by default), `spearman`, `kendall`.
+The probability value matrix in the results is the corresponding probabilities to
+the correlation value in correlation value matrix to be zero in the results.
+
+##### Other Tests of Significance
+23. There is a function **pcor.test()** in package **ggm** can be used to test
+the conditional independence of two variables controlling for one or more additional
+variables. Here is its format.
+```r
+pcor.test(r, q, n)
+```
+The above parameters, *r* is the partial correlation calculated by function **pcor()**,
+*q* is the number of variables in the conditioning set, *n* is the sample size.
+
+### T-Tests
+It is common that comparing two groups in the research. If the result is character 
+type, we can use the method above. But when it comes to continuous, we are hard
+to manage it using the above methods, we will focus on this below.  
+We use data set **UScrime** in package **MASS**. **Prob** is the probabilities of
+prisoning, **U1** is the unemployment rate for urban males ages 14 to 24, **U2**
+is the unemployment for urban males ages 35 to 39, a character type variable **So**
+serves as a grouping variable.
+
+#### Independent T-Test
+A two group independent T-test can be used to test the hypothesis that two 
+population means are equal projected they are independent and sampled from normal
+populations. Here is its format.
+```r
+t.test(y ~ x, data)
+```
+The above parameters, *y* is a numeric variable, *x* is a dichotomous variable.
+It also can be this.
+```r
+t.test(y1, y2)
+```
+The above parameters, *y1* and *y2* are numeric vectors. The optional parameter 
+*data* is a matrix or data frame containing these variables. R assumes the two
+variables have different variances. We can add a parameter `var.equal = TRUE` to
+set the assuming variance equal. Here is an example about the prison probability
+of each state grouped by southern or not southern.
+```{r, include = TRUE}
+library(MASS)
+t.test(Prob ~ So, data = UScrime)
+```
+The p value in results is less than 0.001, so we can reject the hypothesis about
+the same prison probability of southern states and non-southern states.
+
+#### Dependent T-Test
+When observations in two groups are related, we have a dependent-groups design. 
+The pre-post design or repeated measures design also produce dependent groups. 
+T-Test on dependent samples assumes the discrepancies follow normal distribution.
+Here is the format.
+```r
+t.test(y1, y2, paired = TRUE)
+```
+The above parameters, *y1* and *y2* are two dependent numeric vectors.
+```{r, include = TRUE}
+library(MASS)
+sapply(UScrime[c("U1", "U2")], function(x)(c(mean = mean(x), sd = sd(x))))
+with(UScrime, t.test(U1, U2, paired = TRUE))
+```
+
+### Nonparametric Tests of Group Differences
+#### Comparing Two Groups
+24. If two groups are independent, we can use Wilcoxon rank sum test or namely
+Mann-Whitney U test. It can help us determine whether two groups are chosen from
+the same distribution. Its format here.
+```r
+wilcox.test(y ~ x, data)
+```
+The above parameters, *y* is a numeric variable, *x* is a binary variable. There
+is another format here.
+```r
+wilcox.test(y1, y2)
+```
+The above parameters, *y1* and *y2* are the outcome variables of each group.
+Here is the example.
+```{r, include = TRUE}
+with(UScrime, by(Prob, So, median))
+wilcox.test(Prob ~ So, data = UScrime)
+```
+To conclude, if the hypothesis of T test is reasonable, parametric test will be 
+much better than nonparametric test; When the hypothesis turns to be very 
+unreasonable, the latter is better.
+
+#### More than Two Groups
+25. If we have more than two groups to compare differences when it doesn't fulfill
+ANOVA design, nonparametric test is a good choice. If independent, Kruskal-Wallis
+is great; If dependent, Friedman is great. Their formats are here.
+```r
+kruskal.test(y ~ A, data)
+friedman.test(y ~ A | B, data)
+```
+For the front, *y* is a numeric outcome variable, *A* is a grouping variable has
+two or more horizontal levels. For the latter, *y* is a numeric outcome variable,
+*A* is a grouping variable, *B* is a blocking variable that identifies matched 
+observations. *data* can be optional parameter that specifies the matrix or array
+containing these data or variables.
+```{r, include = TRUE}
+states <- data.frame(state.region, state.x77)
+kruskal.test(Illiteracy ~ state.region, data = states)
+```
